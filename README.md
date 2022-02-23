@@ -1,178 +1,178 @@
-# FFmpeg Cheatsheet
+# FFmpeg备忘单
 
-> A cheatsheet for common video processing operations in [FFmpeg](https://ffmpeg.org)
+> [FFmpeg](https://ffmpeg.org)中常见视频处理操作的备忘单
 
-## Operations
+## 操作
 
-*Use the `-y` flag to override the output file if it exists.*
+*如果文件已存在，使用 `-y` 标记来覆盖*
 
-### Audio-video sync
+### 音频-视频 同步
 
-> [Reference](https://superuser.com/questions/982342/in-ffmpeg-how-to-delay-only-the-audio-of-a-mp4-video-without-converting-the-au)
+> [参考](https://superuser.com/questions/982342/in-ffmpeg-how-to-delay-only-the-audio-of-a-mp4-video-without-converting-the-au)
 
 ```sh
-# Delay audio by 3 seconds
+# 音频延后 3 秒
 $ ffmpeg -i input.mov -itsoffset 3 -i input.mov -map 0:v -map 1:a -codec:a copy -codec:v copy output.mov
 
-# Delay video by 3 seconds (ie. advance audio by 3 seconds)
+# 视频延后 3 秒 (即音频提前 3 秒)
 $ ffmpeg -i input.mov -itsoffset 3 -i input.mov -map 1:v -map 0:a -codec:a copy -codec:v copy output.mov
 ```
 
-- The second `-i` flag must come *immediately after* the `-itsoffset` flag.
+- 第二个 `-i` 标记必须 *紧跟着* `-itsoffset` 标记后面。
 
-### Crop
+### 裁剪
 
-> [Reference](https://ffmpeg.org/ffmpeg-filters.html#crop)
+> [参考](https://ffmpeg.org/ffmpeg-filters.html#crop)
 
 ```sh
-# Crop to width 360, height 640
+# 裁剪到 360 宽, 640 高
 $ ffmpeg -i input.mov -filter:v 'crop=360:640:0:0' -codec:a copy output.mov
 
-# Crop to width 360, height 640, starting from coordinates (10, 20)
+# 裁剪到 360 宽,  640 高, 从坐标 (10, 20) 开始
 $ ffmpeg -i input.mov -filter:v 'crop=360:640:10:20' -codec:a copy output.mov
 ```
 
-### Format
+### 格式
 
-> [Reference](https://stackoverflow.com/questions/8075992/using-ffmpeg-convert-a-file-from-one-output)
+> [参考](https://stackoverflow.com/questions/8075992/using-ffmpeg-convert-a-file-from-one-output)
 
 ```sh
-# Convert to GIF
+# 转换到 GIF
 $ ffmpeg -i input.mov output.gif
 
-# Convert from GIF
+# 从 GIF 转换
 $ ffmpeg -i input.gif output.mov
 
-# Convert between non-GIF formats
+# 两个非-GIF 文件转换
 $ ffmpeg -i input.mov -codec:v copy -codec:a copy output.mp4
 ```
 
-### Frame rate
+### 帧率
 
-> [Reference](https://trac.ffmpeg.org/wiki/ChangingFrameRate)
+> [参考](https://trac.ffmpeg.org/wiki/ChangingFrameRate)
 
 ```sh
-# Change the frame rate to 12
+# 调整帧率到 12
 $ ffmpeg -i input.mov -filter:v 'fps=fps=12' -codec:a copy output.mov
 ```
 
-### Strip audio
+### 剥离音频
 
-> [Reference](https://superuser.com/questions/268985/remove-audio-from-video-file-with-ffmpeg)
+> [参考](https://superuser.com/questions/268985/remove-audio-from-video-file-with-ffmpeg)
 
 ```sh
-# Remove audio
+# 移除音频
 $ ffmpeg -i input.mov -codec:v copy -an output.mov
 ```
 
-### Resize
+### 调整大小
 
 > [Reference](https://trac.ffmpeg.org/wiki/Scaling)
 
 ```sh
-# Resize to width 360, height 640
+# 调整到 360 宽,  640 高
 $ ffmpeg -i input.mov -filter:v 'scale=360:640' -codec:a copy output.mov
 
-# Resize to width 360, maintaining the aspect ratio
+# 调整为 360 宽，保持长宽比
 $ ffmpeg -i input.mov -filter:v 'scale=360:-1' -codec:a copy output.mov
 
-# Resize to height 640, maintaining the aspect ratio
+# 调整到 640 高, 保持长宽比
 $ ffmpeg -i input.mov -filter:v 'scale=-1:640' -codec:a copy output.mov
 ```
 
-- Set either `width` or `height` to `-1` to maintain the aspect ratio.
+- 设置 `width` 或 `height` 任意一个到 `-1` 来保持长宽比。
 
-### Reverse
+### 倒放
 
-> [Reference](https://video.stackexchange.com/questions/17738/how-to-use-ffmpeg-command-for-reverse-video)
+> [参考](https://video.stackexchange.com/questions/17738/how-to-use-ffmpeg-command-for-reverse-video)
 
 ```sh
-# Reverse
+# 倒放
 $ ffmpeg -i input.mov -filter:v 'reverse' -filter:a 'areverse' output.mov
 ```
 
-### Rotate
+### 旋转
 
-> [Reference](https://stackoverflow.com/questions/3937387/rotating-videos-with-ffmpeg)
+> [参考](https://stackoverflow.com/questions/3937387/rotating-videos-with-ffmpeg)
 
 ```sh
-# Rotate 90 degrees clockwise
+# 顺时针旋转90度
 $ ffmpeg -i input.mov -filter:v 'transpose=1' -codec:a copy output.mov
 
-# Rotate 90 degrees counter-clockwise
+# 逆时针旋转90度
 $ ffmpeg -i input.mov -filter:v 'transpose=2' -codec:a copy output.mov
 
-# Rotate 180 degrees
+# 旋转180度
 $ ffmpeg -i input.mov -filter:v 'transpose=1,transpose=1' -codec:a copy output.mov
 ```
 
-### Speed
+### 速度
 
-> [Reference](https://trac.ffmpeg.org/wiki/How%20to%20speed%20up%20/%20slow%20down%20a%20video)
+> [参考](https://trac.ffmpeg.org/wiki/How%20to%20speed%20up%20/%20slow%20down%20a%20video)
 
 ```sh
-# Quarter the speed
+# 四分之一的速度
 $ ffmpeg -i input.mov -filter:v 'setpts=4*PTS' -filter:a 'atempo=0.5,atempo=0.5' output.mov
 
-# Halve the speed
+# 速度减半
 $ ffmpeg -i input.mov -filter:v 'setpts=2*PTS' -filter:a 'atempo=0.5' output.mov
 
-# Double the speed
+# 速度加倍
 $ ffmpeg -i input.mov -filter:v 'setpts=0.5*PTS' -filter:a 'atempo=2' output.mov
 
-# Quadruple the speed
+# 四倍的速度
 $ ffmpeg -i input.mov -filter:v 'setpts=0.25*PTS' -filter:a 'atempo=2,atempo=2' output.mov
 ```
 
-- Use the formula `1 ÷ speed` to compute the value of `setpts`.
-  - Half the speed: `setpts=2*PTS` since `1 ÷ 0.5 = 2`.
-  - Double the speed: `setpts=0.5*PTS` since `1 ÷ 2 = 0.5`.
+- 使用共识 `1 ÷ speed` 来计算 `setpts` 的值。
+  - 速度减半: `setpts=2*PTS` 因为 `1 ÷ 0.5 = 2`。
+  - 速度加倍: `setpts=0.5*PTS` 因为 `1 ÷ 2 = 0.5`。
 
-- The value of each `atempo` filter must be between 0.5 and 2.
-  - Quarter the speed: `atempo=0.5,atempo=0.5` since `0.5 × 0.5 = 0.25`.
-  - Quadruple the speed: `atempo=2,atempo=2` since `2 × 2 = 4`.
+- 每个 `atempo` 选项必须介于 0.5 和 2。
+  - 四分之一的速度: `atempo=0.5,atempo=0.5` 因为 `0.5 × 0.5 = 0.25`.
+  - 四倍的速度: `atempo=2,atempo=2` 因为 `2 × 2 = 4`.
 
-### Subtitles
+### 字幕
 
-> [Reference](https://stackoverflow.com/questions/57869367/ffmpeg-subtitles-alignment-and-position)
+> [参考](https://stackoverflow.com/questions/57869367/ffmpeg-subtitles-alignment-and-position)
 
 ```sh
-# Write subtitles into video
+# 字幕写入视频
 $ ffmpeg -i input.mov -filter:v 'subtitles=subtitles.srt' -codec:a copy output.mov
 
-# Write subtitles into video, with custom subtitle styles
+# 字幕写入视频, 使用自定义样式
 $ ffmpeg -i input.mov -filter:v "subtitles=subtitles.srt:force_style='FontName=Menlo Bold,Fontsize=18'" -codec:a copy output.mov
 ```
 
-### Trim
+### 修剪
 
-> [Reference](https://trac.ffmpeg.org/wiki/Seeking#Cuttingsmallsections)
+> [参考](https://trac.ffmpeg.org/wiki/Seeking#Cuttingsmallsections)
 
 ```sh
-# Trim from 0:05 to 0:10
+# 剪去 0:05 到 0:10
 $ ffmpeg -ss 0:05 -to 0:10 -i input.mov -codec:v copy -codec:a copy output.mov
 
-# Trim from 0:05 to the end of the video
+# 减去 0:05 到视频结束
 $ ffmpeg -ss 0:05 -i input.mov -codec:v copy -codec:a copy output.mov
 ```
 
-- The `-ss` and `-to` flags must come *before* the `-i` flag.
+-  `-ss` 和 `-to` 标签必须放在  `-i` 标签 *前面*。
 
-### Volume
+### 音量
 
-> [Reference](https://trac.ffmpeg.org/wiki/AudioVolume)
+> [参考](https://trac.ffmpeg.org/wiki/AudioVolume)
 
 ```sh
-# Halve the volume
+# 音量减半
 $ ffmpeg -i input.mov -codec:v copy -filter:a 'volume=0.5' output.mov
 
-# Double the volume
+# 音量加倍
 $ ffmpeg -i input.mov -codec:v copy -filter:a 'volume=2' output.mov
 ```
 
-## Relevant CLI flags
+## 相关命令行标签
 
-> [Reference](https://ffmpeg.org/ffmpeg.html)
+> [参考](https://ffmpeg.org/ffmpeg.html)
 
 ```
 ffmpeg
@@ -190,6 +190,6 @@ ffmpeg
   <output>
 ```
 
-## See also
+## 另见
 
 - [vdx](https://github.com/yuanqing/vdx)
